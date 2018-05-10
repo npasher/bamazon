@@ -35,8 +35,6 @@ VALUES ("Scratch Made Sour Mix .5L", "N/A Beverage", 4.95, 105);
 INSERT INTO Products (department, department,price,quantity)
 VALUES ("Magarita Glass", "Stemware", 13.99, 200);
 
-
-
 select * from Products;
 
 CREATE TABLE Categories (
