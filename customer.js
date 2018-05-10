@@ -80,4 +80,15 @@ function itemSelect(){
   });
 }
 
-function itemsPurchased(itemSelected)
+function itemsPurchased(itemSelected){
+//new variables decalred for quantity of stock, cost of items and the repective department//
+  let inStock;
+  let costOfItem;
+  let department;
+//returns the first item of the array//
+  let item=itemSelected.shift(); 
+
+  connection.query("SELECT ")
+
+
+}
