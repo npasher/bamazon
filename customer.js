@@ -88,7 +88,91 @@ function itemsPurchased(itemSelected){
 //returns the first item of the array//
   let item=itemSelected.shift(); 
 
-  connection.query("SELECT ")
-
-
-}
+  connection.query("SELECT quantity,price,department FROM Products WHERE ?",{
+    product:item
+  },function(err,res){
+    if(err) throw err;
+    inStock=res[0].quantity;
+    costOfItem=res[0].price;
+    department=res[0].department;
+  });
+  inquirer.prompt([
+    { //Asks for amount of product desired by user.//
+      name:"amount",
+      type:"text",
+      message:"How many of "+item+"will you be purchasing?",
+      validate:function(stocked){ //Checks selected amount vs. in stock amount//
+        if(parseInt(stocked) <=inStock){
+          return true
+        }else{ //If product quantity will not meet selected amount, alerts user.//
+          console.log("Apologies the amount of "+inStock+"is greater than in stock amount.");
+          return false;
+        }
+      }
+    }
+  ]).then(function(user){
+    let amount=user.amount;
+    shoppingCart.push({ //Object for items in cart.//
+      item:item,
+      amount:amount,
+      costOfItem:costOfItem,
+      inStock:inStock,
+      department:department,
+      total:costOfItem*amount
+    });
+      if(itemSelected.length !=0){
+        itemsPurchased(itemSelected);
+      }else{ //Proceed to checkout when user is ready to checkout//
+        checkout();
+      };
+  });
+};
+//Checkout function//
+function checkout(){
+  if(shoppingCart.length !=0){
+    let finalTotal=0;
+    console.log("Here are you items selected for purchase:");
+    for (let i=0;i<shoppingCart.length;i++){
+      let item=shoppingCart[i].item;
+      let amount=shoppingCart[i].amount;
+      let individualCost=shoppingCart[i].costofItem;
+      let total=shoppingCart[i].total;
+      let costofItem=individualCost*amount;
+      finalTotal +=costofItem;
+      console.log(amount+" "+item+" "+"$"+total);
+    }
+      console.log("Final Total: $"+finalTotal);//Displays final total to user//
+      inquirer.prompt([//Prompts user for checkout confirmation//
+        {
+          name:"checkout",
+          typ:"list",
+          message:"If ready to checkout please select Checkout, if not select Back to Cart to edit choices.",
+          choices:["Checkout","Back to Cart"]
+        }
+      ]).then(function(res){
+        if(res.checkout==="Checkout"){ //Calls updateBamazon function if user checksout.//
+          updateBamazon(finalTotal); 
+        }else{//Calls cartEdit function if user chooses to edit cart.//
+          cartEdit();
+        }
+      });    
+  }else{//If purchases are complete and cart is empty, prompt user on how to proceed//
+    inquirer.prompt([
+      {
+        name:"choice",
+        type:"list",
+        message:"Purchases completed.\nPlease choose either Continue Shopping or Exit Bamazon to proceed.",
+        choices:["Continue Shopping.","Exit Bamazon."]
+      }
+    ]).then(function(user){
+      if(user.choice==="Continue Shopping."){//Cycles back to showItems if user selects to keep shopping.//
+        showItems(function(){
+          itemSelect();
+        });
+      }else{//Ends Bamazon if user requests to exit.//
+        console.log("Exiting Bamazon. \nPlease enjoy your party!");
+        connection.end();
+      }
+    });
+  };
+};
