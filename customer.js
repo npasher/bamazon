@@ -1,6 +1,6 @@
 //Require Dependencies//
 const mysql=require("mysql");
-const table=require("cli-table");
+const Table=require("cli-table");
 const inquirer=require("inquirer");
 const colors=require("colors");
 //connection for database//
@@ -176,3 +176,87 @@ function checkout(){
     });
   };
 };
+
+function updateBamazon(finalTotal){
+  let item=shoppingCart.shift();
+  let itemName=item.item;
+  let costOfItem=item.costOfItem;
+  let userPurchase=item.amount;
+  let department=item.department;
+  let departmentTransaction=costOfItem*userPurchase;
+  connection.query("SELECT sales FROM Categories WHERE ? ",{ //query amount on hand// 
+    category_name:department
+  },function(err,res){
+    let fullSales=res[0]["sales"];
+    connection.query("UPDATE Categories SET ? WHERE ?",[{
+      sales:fullSales+=departmentTransaction
+    },
+    {
+      category_name:department
+    }],function(err){
+      if(err) throw err;
+    });
+  });
+    connection.query("SELECT quantity FROM Products WHERE ?", {
+      product:itemName
+    },function(err,res){
+      let inStock=res[0].quantity;
+      console.log("On Hand:"+inStock);
+      connection.query("UPDATE Products SET ? WHERE ?",[ //updating database quantities//
+        {
+          quantity:inStock-=userPurchase
+      },
+      {
+        product:itemName
+      }],function(err){
+        if(err) throw err;
+        if(shoppingCart.length !=0){ //Checks if cart is not empty and if so, runs updateBamazon again.//
+          updateBamazon(finalTotal);
+        }else{ //If Cart is empty, user will receive total and well wishes.//
+          finalTotal=finalTotal.toFixed(2);
+          console.log("Thank You for using Bamazon for your party needs!"+"\n Your Final Total is: $ "+finalTotal);
+          connection.end();
+        }
+      });
+    });
+  };
+
+  function cartEdit(){ //Will push items in Shopping Cart to an array
+    let items=[];
+    for (let i=0; i<shoppingCart.length;i++){
+      let item=shoppingCart[i].item;
+      item.push(item);
+    }
+    inquirer.prompt([
+      {
+        name:"choices",
+        type:"checkbox",
+        message:"Please select which items you will like to edit.",
+        choices:items
+      }
+    ]).then(function(user){
+      if(user.choices.length===0){
+        console.log("No items, in cart, have been selected, please do so now.");
+        checkout();
+      }else{
+        let cartEdit=user.choices;
+        editCartItems(cartEdit);
+      }
+    });
+  };
+  function editCartItems(cartEdit){
+    if(cartEdit.length!=0){
+      let item=cartEdit.shift();//Removes first item from array and returns it.//
+      inquirer.prompt([
+        {
+          name:"choice",
+          type:"list",
+          message:"Reomve: "+item+" from cart or change current quantity?",
+          choices:["Remove Item.","Change Current Quantity."]
+        }
+      ]).then(function(user){
+
+      })
+    }
+  }
+
