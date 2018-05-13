@@ -255,8 +255,19 @@ function updateBamazon(finalTotal){
           choices:["Remove Item.","Change Current Quantity."]
         }
       ]).then(function(user){
-
+        if(user.choice==="Remove Item."){//User has selected to remove item.//
+          for(let i=0;i<shoppingCart.length;i++){
+            if(shoppingCart[i].item===item){
+              shoppingCart.splice(i,1);
+              console.log("Item removed and Cart updated.");
+            }
+          }
+          editCartItems(cartEdit);
+        }else{
+          inquirer.prompt([
+            
+          ])
+        }
       })
     }
   }
-
