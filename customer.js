@@ -100,7 +100,7 @@ function itemsPurchased(itemSelected){
     { //Asks for amount of product desired by user.//
       name:"amount",
       type:"text",
-      message:"How many of "+item+"will you be purchasing?",
+      message:"How many of "+item+" will you be purchasing?",
       validate:function(stocked){ //Checks selected amount vs. in stock amount//
         if(parseInt(stocked) <=inStock){
           return true
@@ -112,7 +112,7 @@ function itemsPurchased(itemSelected){
     }
   ]).then(function(user){
     let amount=user.amount;
-    shoppingCart.push({ //Object for items in cart.//
+    usersCart.push({ //Object for items in cart.//
       item:item,
       amount:amount,
       costOfItem:costOfItem,
@@ -129,23 +129,23 @@ function itemsPurchased(itemSelected){
 };
 //Checkout function//
 function checkout(){
-  if(shoppingCart.length !=0){
+  if(usersCart.length !=0){
     let finalTotal=0;
     console.log("Here are you items selected for purchase:");
-    for (let i=0;i<shoppingCart.length;i++){
-      let item=shoppingCart[i].item;
-      let amount=shoppingCart[i].amount;
-      let individualCost=shoppingCart[i].costofItem;
-      let total=shoppingCart[i].total;
-      let costofItem=individualCost*amount;
-      finalTotal +=costofItem;
+    for (let i=0;i<usersCart.length;i++){
+      let item=usersCart[i].item;
+      let amount=usersCart[i].amount;
+      let individualCost=usersCart[i].costOfItem;
+      let total=usersCart[i].total;
+      let costOfItem=individualCost*amount;
+      finalTotal +=costOfItem;
       console.log(amount+" "+item+" "+"$"+total);
     }
       console.log("Final Total: $"+finalTotal);//Displays final total to user//
       inquirer.prompt([//Prompts user for checkout confirmation//
         {
           name:"checkout",
-          typ:"list",
+          type:"list",
           message:"If ready to checkout please select Checkout, if not select Back to Cart to edit choices.",
           choices:["Checkout","Back to Cart"]
         }
@@ -178,7 +178,7 @@ function checkout(){
 };
 
 function updateBamazon(finalTotal){
-  let item=shoppingCart.shift();
+  let item=usersCart.shift();
   let itemName=item.item;
   let costOfItem=item.costOfItem;
   let userPurchase=item.amount;
@@ -210,7 +210,7 @@ function updateBamazon(finalTotal){
         product:itemName
       }],function(err){
         if(err) throw err;
-        if(shoppingCart.length !=0){ //Checks if cart is not empty and if so, runs updateBamazon again.//
+        if(usersCart.length !=0){ //Checks if cart is not empty and if so, runs updateBamazon again.//
           updateBamazon(finalTotal);
         }else{ //If Cart is empty, user will receive total and well wishes.//
           finalTotal=finalTotal.toFixed(2);
@@ -223,9 +223,9 @@ function updateBamazon(finalTotal){
 
   function cartEdit(){ //Will push items in Shopping Cart to an array
     let items=[];
-    for (let i=0; i<shoppingCart.length;i++){
-      let item=shoppingCart[i].item;
-      item.push(item);
+    for (let i=0; i<usersCart.length;i++){
+      let item=usersCart[i].item;
+      items.push(item);
     }
     inquirer.prompt([
       {
@@ -256,18 +256,33 @@ function updateBamazon(finalTotal){
         }
       ]).then(function(user){
         if(user.choice==="Remove Item."){//User has selected to remove item.//
-          for(let i=0;i<shoppingCart.length;i++){
-            if(shoppingCart[i].item===item){
-              shoppingCart.splice(i,1);
+          for(let i=0;i<usersCart.length;i++){
+            if(usersCart[i].item===item){
+              usersCart.splice(i,1);
               console.log("Item removed and Cart updated.");
             }
           }
           editCartItems(cartEdit);
         }else{
           inquirer.prompt([
-            
-          ])
+            {
+              name:"amount",
+              type:"text",
+              message:"How much of "+item+" will you require for purchase?",
+            }
+          ]).then(function(user){
+            for (let i=0;i<usersCart.length;i++){
+              if (usersCart[i].item===item){
+                usersCart[i].amount=user.amount;
+                usersCart[i].total=usersCart[i].costOfItem*user.amount;
+                console.log("Cart is updated.");
+              }
+            }
+            editCartItems(cartEdit);
+          });
         }
-      })
+      });
+    }else{
+      checkout();
     }
-  }
+  };
