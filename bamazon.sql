@@ -32,7 +32,7 @@ INSERT INTO Products (product,department,price,quantity)
 VALUES ("Modelo Negra 24pk", "Beer", 23.95, 12);
 INSERT INTO Products (product, department,price,quantity)
 VALUES ("Scratch Made Sour Mix .5L", "N/A Beverage", 4.95, 105);
-INSERT INTO Products (department, department,price,quantity)
+INSERT INTO Products (product, department,price,quantity)
 VALUES ("Magarita Glass", "Stemware", 13.99, 200);
 
 
@@ -41,22 +41,22 @@ select * from Products;
 
 CREATE TABLE Categories (
  category_id INTEGER(10) AUTO_INCREMENT NOT NULL,
- category_name VARCHAR(50) NOT NULL,
+ department VARCHAR(50) NOT NULL,
  category_sales FLOAT(7, 2) NOT NULL,
  PRIMARY KEY (category_id)
  );
  
- INSERT INTO Categories (category_name,sales)
+ INSERT INTO Categories (department,category_sales)
  VALUES("Smallwares",0);
- INSERT INTO Categories (category_name,sales)
+ INSERT INTO Categories (department,category_sales)
  VALUES("Produce",0);
- INSERT INTO Categories (category_name,sales)
+ INSERT INTO Categories (department,category_sales)
  VALUES("Liquor",0);
- INSERT INTO Categories (category_name,sales)
+ INSERT INTO Categories (department,category_sales)
  VALUES("Beer",0);
- INSERT INTO Categories (category_name,sales)
+ INSERT INTO Categories (department,category_sales)
  VALUES("N/A Beverage",0);
- INSERT INTO Categories (category_name,sales)
+ INSERT INTO Categories (department,category_sales)
  VALUES("Stemware",0);
  
  select * from Categories;
