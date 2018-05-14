@@ -42,7 +42,7 @@ select * from Products;
 CREATE TABLE Categories (
  category_id INTEGER(10) AUTO_INCREMENT NOT NULL,
  category_name VARCHAR(50) NOT NULL,
- sales FLOAT(7, 2) NOT NULL,
+ category_sales FLOAT(7, 2) NOT NULL,
  PRIMARY KEY (category_id)
  );
  

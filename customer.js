@@ -183,14 +183,15 @@ function updateBamazon(finalTotal){
   let costOfItem=item.costOfItem;
   let userPurchase=item.amount;
   let department=item.department;
-  let departmentTransaction=costOfItem*userPurchase;
-  connection.query("SELECT sales FROM Categories WHERE ? ",{ //query amount on hand// 
+  let categoryTransaction=costOfItem*userPurchase;
+  connection.query("SELECT category_sales FROM Categories WHERE ? ",{ //query amount on hand// 
     category_name:department
   },function(err,res){
-    let fullSales=res[0]["sales"];
-    connection.query("UPDATE Categories SET ? WHERE ?",[{
-      sales:fullSales+=departmentTransaction
-    },
+    let salesTotal=res[0]["category_sales"];
+    connection.query("UPDATE Categories SET ? WHERE ?",[
+      {
+      sales:salesTotal+=categoryTransaction
+      },
     {
       category_name:department
     }],function(err){
