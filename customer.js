@@ -101,11 +101,11 @@ function itemsPurchased(itemSelected){
       name:"amount",
       type:"text",
       message:"How many of "+item+" will you be purchasing?",
-      validate:function(stocked){ //Checks selected amount vs. in stock amount//
-        if(parseInt(stocked) <=inStock){
+      validate:function(inStock){ //Checks selected amount vs. in stock amount//
+        if(parseInt(inStock) <=inStock){
           return true
         }else{ //If product quantity will not meet selected amount, alerts user.//
-          console.log("Apologies the amount of "+inStock+"is greater than in stock amount.");
+          console.log("Apologies the amount of "+inStock+" is greater than in stock amount.");
           return false;
         }
       }
@@ -150,13 +150,13 @@ function checkout(){
           choices:["Checkout","Back to Cart"]
         }
       ]).then(function(res){
-        if(res.checkout==="Checkout"){ //Calls updateBamazon function if user checksout.//
+        if(res.checkout==="Checkout"){ //Calls updateBamazon function if user checks out.//
           updateBamazon(finalTotal); 
         }else{//Calls cartEdit function if user chooses to edit cart.//
           cartEdit();
         }
       });    
-  }else{//If purchases are complete and cart is empty, prompt user on how to proceed//
+        }else{//If purchases are complete and cart is empty, prompt user on how to proceed//
     inquirer.prompt([
       {
         name:"choice",
@@ -175,7 +175,7 @@ function checkout(){
       }
     });
   };
-};
+}
 
 function updateBamazon(finalTotal){
   let item=usersCart.shift();
@@ -183,21 +183,21 @@ function updateBamazon(finalTotal){
   let costOfItem=item.costOfItem;
   let userPurchase=item.amount;
   let department=item.department;
-  let categoryTransaction=costOfItem*userPurchase;
-  connection.query("SELECT category_sales FROM Categories WHERE ? ",{ //query amount on hand// 
-    department:department
-  },function(err,res){
-    let categoryTotal=res[0]["category_sales"];
-    connection.query("UPDATE Categories SET ? WHERE ?",[
-      {
-      category_sales:categoryTotal+=categoryTransaction
-      },
-    {
-      department:department
-    }],function(err){
-      if(err) throw err;
-    });
-  });
+  // let categoryTransaction=costOfItem*userPurchase;
+  // connection.query("SELECT category_sales FROM Categories WHERE ? ",{ //query amount on hand// 
+  //   department:department
+  // },function(err,res){
+  //   let categoryTotal=res[0]["category_sales"];
+  //   connection.query("UPDATE Categories SET ? WHERE ?",[
+  //     {
+  //     category_sales:categoryTotal+=categoryTransaction
+  //     },
+  //   {
+  //     department:department
+  //   }],function(err){
+  //     if(err) throw err;
+  //   });
+  // });
     connection.query("SELECT quantity FROM Products WHERE ?", {
       product:itemName
     },function(err,res){
@@ -258,7 +258,7 @@ function updateBamazon(finalTotal){
       ]).then(function(user){
         if(user.choice==="Remove Item."){//User has selected to remove item.//
           for(let i=0;i<usersCart.length;i++){
-            if(usersCart[i].item===item){
+            if(usersCart[i].item === item){
               usersCart.splice(i,1);
               console.log("Item removed and Cart updated.");
             }
@@ -273,7 +273,7 @@ function updateBamazon(finalTotal){
             }
           ]).then(function(user){
             for (let i=0;i<usersCart.length;i++){
-              if (usersCart[i].item===item){
+              if (usersCart[i].item === item){
                 usersCart[i].amount=user.amount;
                 usersCart[i].total=usersCart[i].costOfItem*user.amount;
                 console.log("Cart is updated.");
